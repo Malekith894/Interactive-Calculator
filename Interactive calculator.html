@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Interactive Calculator</title>
+        <meta name="viewport" content="width=device-width , initial-scale=1.0">
+        <style>
+            #desktop{
+                width:680px;
+                height:700px;
+                background: rgba(128, 128, 128, 0.5);
+                margin-top:150px ;
+                margin-left: 600px;
+                display: grid;
+                grid-template-rows: 200px 250px 250px;
+                grid-template-columns: 250px 250px 180px;
+                grid-template-areas: 
+                "display display operators"
+                "calculation calculation calculation"
+                "calculation calculation calculation"
+                ;
+            }
+
+            #display{
+                grid-area:display;
+                background-color: rgba(128, 128, 128, 0.062);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            #calculation{
+                grid-area: calculation;
+                background-color: rgba(128, 128, 128, 0.062);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 4px;
+            }
+            #operators{
+                grid-area: operators;
+                background-color: rgba(128, 128, 128, 0.062);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 3px;
+                padding-top: 4px;
+                padding-bottom: 5px;
+            }
+            button{
+                width: 165px;
+                height: 120px;
+                flex-grow: 1;
+                font-size: large;
+                background-color: white;
+                border-radius: 6px;
+            }
+            .numbers {
+                display: flex;
+                flex-direction: row;
+                align-content: space-around;
+                gap: 4px;
+            }
+            body{
+                background-color: antiquewhite;
+            }
+            #page{
+                background-color: cadetblue;
+                width:480px;
+                height:170px;
+                border-radius: 6px;
+               display: flex;
+               align-items: center;
+               
+            }
+            #flash{
+                animation-name: flashy;
+                animation-duration: 1s;
+                animation-iteration-count: infinite;
+                animation-direction: alternate-reverse;
+                animation-timing-function: ease-in-out;
+                display: flex;
+                width:4px;
+                height:80px;
+                background-color: black;
+                margin-left: 7px;
+            }
+            @keyframes flashy{
+                from{
+                    background-color: black;
+                }
+                to{
+                   background-color: cadetblue;
+                }
+            }
+            span{
+                font-size: xx-large;
+            }
+            </style>
+    </head>
+    <body>
+        <div id="desktop">
+            <div id="display">
+                <div id="page">
+                    <div id="flash"></div>
+                    <div id="negative"></div>
+                    <div id="number_message"></div>
+                    <div id="operating_message"></div>
+                    <div id="number_message2"></div>
+                </div>
+            </div>
+            
+            <div id="calculation">
+                <div class="numbers">
+                    <button>0</button>
+                    <button>1</button>
+                    <button>2</button>
+                    <button>+</button>
+                </div>
+                <div class="numbers">
+                    <button>3</button>
+                    <button>4</button>
+                    <button>5</button>
+                    <button>-</button>
+                </div>
+                <div class="numbers">
+                    <button>6</button>
+                    <button>7</button>
+                    <button>8</button>
+                    <button>*</button>
+                </div>
+                <div class="numbers">
+                    <button>9</button>
+                    <button>+/-</button>
+                    <button style="font-size: xx-large;">.</button>
+                    <button>/</button>
+                </div>
+            </div>
+            <div id="operators">
+                <button >=</button>
+                <button >Remove</button>
+            </div>
+        </div>
+        <script>
+            /* display number is used to show the first number, display_number2 is used to display the second number,
+            display_operation is used to display the signs. negate_sign is made to show the negative sign just before the first number
+            and the negative sign for the second number is shown in display_operation
+            */
+
+            const button_list=document.querySelectorAll("button");
+            const display_number=document.getElementById("number_message");
+            const display_operation=document.getElementById("operating_message");
+            const display_number2=document.getElementById("number_message2");
+            const negate_sign=document.getElementById("negative");
+
+            // number_list is made to store numbers buttons and operating-signs to store modeules which are used in for loops to make lesser code
+           const number_list=[button_list[0],button_list[1],button_list[2],button_list[4],button_list[5],
+           button_list[6],button_list[8],button_list[9],button_list[10],button_list[12]];
+           const signs_list=[button_list[3],button_list[7],button_list[11],button_list[15]];
+           const operating_signs=["+","-","*","/"];
+
+           //initializing lists to store numbers and operators
+           //to do the calculations, the first list is used to store the first number, the second to store the second number 
+           //the third to store opeartions and results to store the result of operation
+           let calculation_first=[];
+           let calculation_second=[];
+           let operation_list=[];
+           let results=[];
+            
+           //numbers modules
+           for(let i=0;i<10;i++){
+            number_list[i].addEventListener("click",function(){
+                if(operation_list.length>=1){
+                    calculation_second.push(i);
+                    let number=document.createElement("span");
+                    number.textContent=i;
+                    display_number2.appendChild(number);
+                } else {
+                    calculation_first.push(i);
+                    let number=document.createElement("span");
+                    number.textContent=i;
+                    display_number.appendChild(number);
+                }
+            });
+            };
+
+            //Operating modules
+            for(let k=0;k<operating_signs.length;k++){
+                signs_list[k].addEventListener("click",function(){
+                    //the first condition is to avoid dislaying two opeartions at once
+                   if(operation_list.length>=1){
+                    //the opeartion list is emptied and the sign is replace by another sign
+                    display_operation.innerHTML="";
+                    let sign=document.createElement("span");
+                    sign.textContent=operating_signs[k];
+                    display_operation.appendChild(sign);
+                    operation_list[0]=operating_signs[k];
+                } else{
+                    //the second opeartion is used to dipaly the first operating sign
+                    let number=document.createElement("span");
+                    number.textContent=operating_signs[k];
+                    display_operation.appendChild(number);
+                    operation_list.push(operating_signs[k]); 
+                }; 
+                });
+            };
+            
+
+            const calculation=function(){
+                /*this function is used to make the calculation. two lists are made to store the content of calculation lists,
+                as strings. so we can use concat to put the numbers together as a single number.
+                */
+               if(calculation_first.length===0|| calculation_second.length===0 ){
+                return;
+               }
+               //we could have used .join('') for calulation_dirst and the second list !?
+                const strings1=[];
+                const strings2=[];
+                for(const number of calculation_first){
+                    strings1.push(String(number))
+                };
+                for(const number of calculation_second){
+                    strings2.push(String(number))
+                };
+                
+                let string1=strings1[0];
+                let string2=strings2[0];
+                for(let i=1;i<strings1.length;i++){
+                    string1=string1.concat(strings1[i])
+                };
+                for(let i=1;i<strings2.length;i++){
+                    string2=string2.concat(strings2[i])
+                };
+                
+                let number1=Number(string1);
+                let number2=Number(string2);
+                
+                if(operation_list[0]=='+'){
+                    results.push(number1+number2);
+                } else if(operation_list[0]=='-'){
+                    results.push(number1-number2);
+                } else if(operation_list[0]=='*'){
+                    results.push(number1*number2);
+                } else if(operation_list[0]=="/"){
+                    results.push(number1/number2);
+                }
+
+                //after the calculation,we clear everything from display page.
+                //we store the result as the first number, so we can do caculation on it
+                display_number.innerHTML="";
+                display_number2.innerHTML="";
+                display_operation.innerHTML="";
+                negate_sign.innerHTML="";
+                calculation_second.length=0;
+                operation_list.length=0;
+                calculation_first.length=0;
+                calculation_first[0]=results[0];
+
+                //we empty the result list for future calculations
+                //we could make another list to store the results of previous calculations though!
+                //toPrecision was used becuase in operations including decimal points, many irrelevant numbers were displayed
+                let result=document.createElement("span");
+                result.textContent=Number(results[0].toPrecision(12));
+                display_number.appendChild(result);
+                results.length=0;
+            };
+            // '=' sign
+            button_list[16].addEventListener("click",calculation);
+
+            //'.' button 
+            button_list[14].addEventListener("click",function(){
+                const regex=/\./;
+                //when i used .includes('.') a bug appeared. certainly u dont want to show two . sign on screen
+                //becuase result has only one string. but caculation_first has many numnbers as strings that are not together and can be accessed individually
+                //using regex, we can avoid displaying two '.' signs on screen at once. 
+                
+                if(calculation_first.includes('.')){
+                    
+                } else if(regex.test(calculation_first)){
+
+                } else if(calculation_first.includes('.')==false && operation_list.length==0){
+                    calculation_first.push('.');
+                    let pointer=document.createElement("span");
+                    pointer.textContent='.';
+                    display_number.appendChild(pointer);
+                };
+
+                if(calculation_second.includes('.')){
+
+                } else if(calculation_second.includes('.')==false && operation_list.length!=0){
+                    calculation_second.push('.');
+                    let pointer=document.createElement("span");
+                    pointer.textContent='.';
+                    display_number2.appendChild(pointer);
+                };
+            });
+
+            // +/- is used to use negative numbers
+            button_list[13].addEventListener("click",function(){
+                //negate sign was made to show the negative sign just before the number not after it.
+                //the first two conditions display the - sign if it doesnt exist yet 
+                //the third and fouth elements are made to remove the negative signs from both calculation and screen
+                const regex1=/-/;
+                const regex2=/\d+/;
+                list=[];
+                if(regex1.test(calculation_first[0]) && regex2.test(calculation_first[0])){
+                    console.log(calculation_first)
+                    let number1=String(calculation_first[0]);
+                    console.log(number1)
+                    for(let i=1;i<number1.length;i++){
+                        list.push(number1[i])
+                    };
+                    console.log(list)
+                    let number=list[0];
+                    for(let j=1;j<list.length;j++){
+                        number=number.concat(list[j]);
+                    };
+                    
+                    calculation_first.length=0;
+                    display_number.innerHTML="";
+                    negate_sign.innerHTML="";
+                    calculation_first[0]=number;
+                    let number2=document.createElement("span");
+                    number2.textContent=calculation_first[0];
+                    display_number.appendChild(number2)
+                    
+                } else if(operation_list.length==0 && calculation_first.includes('-')==false){
+                    calculation_first.unshift('-')
+                    let sign=document.createElement("span");
+                    sign.textContent="-";
+                    negate_sign.appendChild(sign);
+                } else if(operation_list.length>=1 && calculation_second.includes('-')==false){
+                    calculation_second.unshift('-');
+                    let sign=document.createElement("span");
+                    sign.textContent="-";
+                    sign.setAttribute("id","negative3")
+                    display_operation.appendChild(sign);
+                } else if(calculation_first.includes('-') && operation_list.length==0){
+                    console.log(calculation_first)
+                    calculation_first.shift();
+                    negate_sign.innerHTML="";
+                } else if(calculation_second.includes('-') && operation_list.length>=1){
+                    //setattribute was made so we could use removeChild on it adn remove the second
+                    //negative sign which was added to opeartion_sign part as a span element
+                    calculation_second.shift();
+                    let negative2=document.getElementById("negative3");
+                    console.log(negative2)
+                    display_operation.removeChild(negative2);
+                };
+                
+            });
+
+            //Remove module
+            button_list[17].addEventListener("click",function(){
+                // it clears all elements and lists
+                display_number.innerHTML="";
+                display_number2.innerHTML="";
+                display_operation.innerHTML="";
+                negate_sign.innerHTML="";
+
+                calculation_first.length=0;
+                calculation_second.length=0;
+                operation_list.length=0;
+            });
+        </script>
+    </body>
+</html>
